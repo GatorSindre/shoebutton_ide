@@ -1,5 +1,16 @@
+/* Navigation guide
+
+#website      Every component that is used to host the website (Currently disabled with comments)
+
+
+*/
+
 #include <WiFi.h>
+
+/* Used to host the website   #website
 #include <WebServer.h>
+WebServer server(80);
+*/
 
 // CD Laptop
 //              c:\Users\olsen\OneDrive - Troms Fylkeskommune\Skrivebord2\GitHub\shoebutton_ide
@@ -12,7 +23,6 @@
 const char* ssid = "Nettverksnavn";
 const char* password = "35961574";
 
-WebServer server(80);
 
 // =========================
 // FSR / Morse settings
@@ -96,11 +106,11 @@ void runCMD() {
   String cmdMessage = fullMessage;
   fullMessage = "";
 
-  if (cmdMessage == "wf") {
+  if (cmdMessage == "WF") {
     // TEST FUNCTION FOR NOW
     fullMessage += "wifi";
   }
-  else if (cmdMessage == "kb") {
+  else if (cmdMessage == "KB") {
     // TEST FUNCTION FOR NOW
     fullMessage += "keyboard";
   }
@@ -112,7 +122,7 @@ void specialCMD(char letter) {
       // Enter function
       runCMD();
       break;
-    case 'i':
+    case 'I':
       if (fullMessage.length() > 0) {
         fullMessage.remove(fullMessage.length() - 1);
       }
@@ -126,6 +136,7 @@ void specialCMD(char letter) {
   }
 }
 
+/* Function to call the html of the website #website
 void handleRoot() {
   String page = "<html><body>";
   page += "<h1>Morse Code</h1>";
@@ -134,10 +145,11 @@ void handleRoot() {
 
   server.send(200, "text/html", page);
 }
+*/
 
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   WiFi.begin(ssid, password);
 
@@ -155,12 +167,17 @@ void setup() {
 
   Serial.println("Morse ready!");
 
+  /* Website hosting begin #website
   server.on("/", handleRoot);
   server.begin();
+  */
 }
 
 void loop() {
+  /* Handling website loop #website
   server.handleClient();
+  */
+
 
   unsigned long currentTime = millis();
 
@@ -181,7 +198,6 @@ void loop() {
 
     pressStartTime = currentTime;
 
-    Serial.println("PRESS");
   }
 
 
@@ -196,10 +212,9 @@ void loop() {
 
     if (pressDuration > SPECIAL_CHAR_TIME) {
 
-      morseCode += "_";
-
+      // morseCode += "_";
       Serial.println("SPECIAL");
-
+      specialActive = true;
 
     } else if (pressDuration < DOT_DASH_TIME) {
 
@@ -223,10 +238,7 @@ void loop() {
 
     char letter = translateMorse(morseCode);
 
-    if (letter == '_') {
-      specialActive = true;
-    }
-    else if (specialActive == true) {
+    if (specialActive == true) {
       specialCMD(letter);  
       specialActive = false;
     }
