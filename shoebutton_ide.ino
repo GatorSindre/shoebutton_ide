@@ -2,7 +2,7 @@
 #include <WebServer.h>
 
 // CD Laptop
-//              c:\Users\olsen\OneDrive - Troms Fylkeskommune\Skrivebord2\GitHub\shoebutton_ide>
+//              c:\Users\olsen\OneDrive - Troms Fylkeskommune\Skrivebord2\GitHub\shoebutton_ide
 
 
 // =========================
@@ -44,7 +44,7 @@ bool wasPressed = false;
 unsigned long pressStartTime = 0;
 unsigned long releaseStartTime = 0;
 unsigned long lastReadTime = 0;
-float specialActive = 0;
+bool specialActive = false;
 
 
 char translateMorse(String code) {
@@ -92,31 +92,35 @@ char translateMorse(String code) {
 }
 
 void runCMD() {
-  switch (full) {
-    case wf:
-      // WiFi Function
-      break;
-      default;
-      // No CMD Found
-      break;
+
+  String cmdMessage = fullMessage;
+  fullMessage = "";
+
+  if (cmdMessage == "wf") {
+    // TEST FUNCTION FOR NOW
+    fullMessage += "wifi";
+  }
+  else if (cmdMessage == "kb") {
+    // TEST FUNCTION FOR NOW
+    fullMessage += "keyboard";
   }
 }
 
-void specialCMD() {
+void specialCMD(char letter) {
   switch (letter) {
-    case 'e':
+    case 'E':
       // Enter function
-      runcmd();
+      runCMD();
       break;
     case 'i':
       if (fullMessage.length() > 0) {
         fullMessage.remove(fullMessage.length() - 1);
       }
       break;
-    case 's':
-      fullmessage = "";
+    case 'S':
+      fullMessage = "";
       break;
-    case default:
+    default:
       // Case default :
       break;
   }
@@ -186,6 +190,10 @@ void loop() {
 
     unsigned long pressDuration = currentTime - pressStartTime;
 
+    Serial.print("HoldTime: ");
+    Serial.print(pressDuration);
+    Serial.println(" ms");
+
     if (pressDuration > SPECIAL_CHAR_TIME) {
 
       morseCode += "_";
@@ -215,13 +223,14 @@ void loop() {
 
     char letter = translateMorse(morseCode);
 
-    if (specialActive == 1) {
-      specialCMD();  //TODO
-    }
-
     if (letter == '_') {
-      specialActive = 1;
-    } else {
+      specialActive = true;
+    }
+    else if (specialActive == true) {
+      specialCMD(letter);  
+      specialActive = false;
+    }
+    else if (letter != '?') {
       // Add the decoded letter to the full message
       fullMessage += letter;
     }
