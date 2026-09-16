@@ -1,3 +1,1 @@
-Code for my esp32
-
-NOTE: Check note website for future plans
+Code for my esp32 and its buttons
